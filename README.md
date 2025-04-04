@@ -1,73 +1,110 @@
-# Welcome to your Lovable project
 
-## Project info
+# TinyLlama Chat Application
 
-**URL**: https://lovable.dev/projects/b5525b63-7926-4352-a731-cb315fe081d3
+This project is a modern chat interface that connects to a TinyLlama language model running on a Flask backend.
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+- **Frontend**: React application with TypeScript and Tailwind CSS
+- **Backend**: Python Flask server that connects to a local Ollama instance running TinyLlama
 
-**Use Lovable**
+## Frontend Setup
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b5525b63-7926-4352-a731-cb315fe081d3) and start prompting.
+The frontend is built with React, TypeScript, and Tailwind CSS.
 
-Changes made via Lovable will be committed automatically to this repo.
+### Running the frontend:
 
-**Use your preferred IDE**
+```bash
+# Navigate to the project directory
+cd tinyLlama-chat
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# Install dependencies
+npm install
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Backend Setup
 
-**Use GitHub Codespaces**
+The backend requires Python with Flask and some additional packages.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 1. Install Python dependencies:
 
-## What technologies are used for this project?
+```bash
+pip install flask flask-cors requests
+```
 
-This project is built with:
+### 2. Make sure you have Ollama installed and TinyLlama pulled:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Download Ollama from [https://ollama.ai/](https://ollama.ai/)
 
-## How can I deploy this project?
+Then pull the TinyLlama model:
 
-Simply open [Lovable](https://lovable.dev/projects/b5525b63-7926-4352-a731-cb315fe081d3) and click on Share -> Publish.
+```bash
+ollama pull tinyllama
+```
 
-## Can I connect a custom domain to my Lovable project?
+### 3. Save the following code as `server.py`:
 
-Yes it is!
+```python
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import requests
+import json
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+app = Flask(__name__)
+CORS(app)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("message")
+
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={"model": "tinyllama", "prompt": user_input, "stream": True},
+            stream=True
+        )
+
+        complete_response = ""
+        for line in response.iter_lines():
+            if line:
+                try:
+                    chunk = line.decode('utf-8')
+                    data = json.loads(chunk)
+                    complete_response += data.get("response", "")
+                except json.JSONDecodeError:
+                    print("Failed to decode:", chunk)
+                    continue
+
+        return jsonify({"response": complete_response.strip()})
+    except Exception as e:
+        return jsonify({"response": f"Error: {str(e)}"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5050, debug=True)
+```
+
+### 4. Run the backend server:
+
+```bash
+python server.py
+```
+
+The server will run at `http://localhost:5050`.
+
+## Using the Application
+
+1. Start the backend server
+2. Start the frontend application
+3. Open your browser to `http://localhost:8080`
+4. Begin chatting with TinyLlama!
+
+## Note
+
+- Ensure Ollama is running with the TinyLlama model available
+- The backend expects Ollama to be accessible at `http://localhost:11434`
+- The frontend expects the backend to be accessible at `http://localhost:5050`
