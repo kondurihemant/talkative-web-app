@@ -14,7 +14,7 @@ def chat():
     try:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": "gemma:3b", "prompt": user_input, "stream": True},
+            json={"model": "tinyllama", "prompt": user_input, "stream": True},
             stream=True
         )
 

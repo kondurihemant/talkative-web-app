@@ -1,12 +1,12 @@
 
-# Gemma 3 Chat Application
+# TinyLlama Chat Application
 
-This project is a modern chat interface that connects to a Gemma 3 language model running on a Flask backend.
+This project is a modern chat interface that connects to a TinyLlama language model running on a Flask backend.
 
 ## Project Structure
 
 - **Frontend**: React application with TypeScript and Tailwind CSS
-- **Backend**: Python Flask server that connects to a local Ollama instance running Gemma 3
+- **Backend**: Python Flask server that connects to a local Ollama instance running TinyLlama
 
 ## Frontend Setup
 
@@ -16,7 +16,7 @@ The frontend is built with React, TypeScript, and Tailwind CSS.
 
 ```bash
 # Navigate to the project directory
-cd gemma3-chat
+cd tinyLlama-chat
 
 # Install dependencies
 npm install
@@ -37,14 +37,14 @@ The backend requires Python with Flask and some additional packages.
 pip install flask flask-cors requests
 ```
 
-### 2. Make sure you have Ollama installed and Gemma 3 pulled:
+### 2. Make sure you have Ollama installed and TinyLlama pulled:
 
 Download Ollama from [https://ollama.ai/](https://ollama.ai/)
 
-Then pull the Gemma 3 model:
+Then pull the TinyLlama model:
 
 ```bash
-ollama pull gemma:3b
+ollama pull tinyllama
 ```
 
 ### 3. Save the following code as `server.py`:
@@ -65,7 +65,7 @@ def chat():
     try:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": "gemma:3b", "prompt": user_input, "stream": True},
+            json={"model": "tinyllama", "prompt": user_input, "stream": True},
             stream=True
         )
 
@@ -101,10 +101,10 @@ The server will run at `http://localhost:5050`.
 1. Start the backend server
 2. Start the frontend application
 3. Open your browser to `http://localhost:8080`
-4. Begin chatting with Gemma 3!
+4. Begin chatting with TinyLlama!
 
 ## Note
 
-- Ensure Ollama is running with the Gemma 3 model available
+- Ensure Ollama is running with the TinyLlama model available
 - The backend expects Ollama to be accessible at `http://localhost:11434`
 - The frontend expects the backend to be accessible at `http://localhost:5050`
